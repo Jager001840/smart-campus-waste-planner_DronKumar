@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Campus Waste Monitoring & Collection Route Planner | Dron Kumar Singh</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- System / Educational Prototype Banner -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-branding">
+        <div class="logo-badge">
+          <span class="logo-icon">♻️</span>
+        </div>
+        <div>
+          <h1 class="project-title">Smart Campus Waste Monitoring &amp; Collection Route Planner</h1>
+          <p class="project-subtitle">
+            Academic Microproject Integration: <strong>COA</strong> &bull; <strong>FLAT</strong> &bull; <strong>DAA</strong>
+          </p>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="student-chip">
+          <span class="chip-label">Student Developer</span>
+          <span class="chip-name">Dron Kumar Singh</span>
+        </div>
+      </div>
+    </div>
+    <div class="prototype-notice-bar" role="alert">
+      <span class="notice-icon">⚠️</span>
+      <span class="notice-text">
+        <strong>Notice:</strong> Educational Prototype — Dustbin readings are manually updated or simulated. No live sensors are connected.
+      </span>
+    </div>
+    <div id="storage-alert-banner" class="storage-warning-banner" role="alert" style="display: none;">
+      <span class="notice-icon">⚠️</span>
+      <span class="notice-text">
+        <strong>LocalStorage Unavailable:</strong> Browser storage is restricted or disabled. Records will be maintained in active session memory only and will not persist across browser refreshes.
+      </span>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="main-nav" aria-label="Main Navigation">
+    <div class="nav-container">
+      <ul class="nav-list" role="tablist">
+        <li role="presentation">
+          <button class="nav-btn active" role="tab" aria-selected="true" data-tab="dashboard" id="tab-dashboard">
+            <span class="nav-icon">📊</span> Dashboard
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="nav-btn" role="tab" aria-selected="false" data-tab="management" id="tab-management">
+            <span class="nav-icon">🗑️</span> Dustbin Management
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="nav-btn" role="tab" aria-selected="false" data-tab="coa" id="tab-coa">
+            <span class="nav-icon">🔢</span> COA &mdash; Binary Data Lab
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="nav-btn" role="tab" aria-selected="false" data-tab="flat" id="tab-flat">
+            <span class="nav-icon">⚙️</span> FLAT &mdash; DFA Validator
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="nav-btn" role="tab" aria-selected="false" data-tab="daa" id="tab-daa">
+            <span class="nav-icon">🗺️</span> DAA &mdash; Collection Route Planner
+          </button>
+        </li>
+        <li role="presentation">
+          <button class="nav-btn" role="tab" aria-selected="false" data-tab="about" id="tab-about">
+            <span class="nav-icon">ℹ️</span> About Project
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Main Content Body -->
+  <main class="main-content">
+
+    <!-- ==========================================
+         SECTION 1: DASHBOARD
+         ========================================== -->
+    <section id="section-dashboard" class="content-section active" role="tabpanel" aria-labelledby="tab-dashboard">
+      <div class="section-header">
+        <div>
+          <h2>Campus Waste Monitoring Dashboard</h2>
+          <p class="text-muted">Real-time status overview of campus dustbins, priority alerts, and route planning shortcuts.</p>
+        </div>
+        <div class="action-btn-group">
+          <button class="btn btn-primary" id="btn-quick-add"><span class="btn-icon">➕</span> Add Dustbin</button>
+          <button class="btn btn-secondary" id="btn-quick-update"><span class="btn-icon">📝</span> Update Fill Level</button>
+          <button class="btn btn-outline" id="btn-quick-route"><span class="btn-icon">🚀</span> Open Route Planner</button>
+          <button class="btn btn-outline" id="btn-load-demo"><span class="btn-icon">🔄</span> Load Demo Data</button>
+          <button class="btn btn-danger-outline" id="btn-reset-data"><span class="btn-icon">⚠️</span> Reset Demo Data</button>
+        </div>
+      </div>
+
+      <!-- 7.1 Summary Cards -->
+      <div class="summary-cards-grid">
+        <div class="summary-card card-total">
+          <div class="card-icon-box">📦</div>
+          <div class="card-content">
+            <span class="card-label">Total Dustbins</span>
+            <span class="card-value" id="stat-total-bins">0</span>
+            <span class="card-desc">Active campus bins registered</span>
+          </div>
+        </div>
+        <div class="summary-card card-critical">
+          <div class="card-icon-box">🚨</div>
+          <div class="card-content">
+            <span class="card-label">Critical Level (75–100%)</span>
+            <span class="card-value" id="stat-critical-bins">0</span>
+            <span class="card-desc">Requires immediate collection</span>
+          </div>
+        </div>
+        <div class="summary-card card-high">
+          <div class="card-icon-box">⚠️</div>
+          <div class="card-content">
+            <span class="card-label">High Fill (50–74%)</span>
+            <span class="card-value" id="stat-high-bins">0</span>
+            <span class="card-desc">Scheduled for next collection round</span>
+          </div>
+        </div>
+        <div class="summary-card card-low">
+          <div class="card-icon-box">✅</div>
+          <div class="card-content">
+            <span class="card-label">Low Fill (0–24%)</span>
+            <span class="card-value" id="stat-low-bins">0</span>
+            <span class="card-desc">Sufficient available capacity</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Priority Collection List -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>🚨 Priority Collection Attention List</h3>
+            <p class="panel-subtitle">Sorted by: Critical first &rarr; High second &rarr; Fill % descending &rarr; Stable Dustbin ID tie-breaker.</p>
+          </div>
+          <span class="badge badge-info" id="priority-count-badge">0 urgent bins</span>
+        </div>
+        <div id="priority-list-container">
+          <!-- Dynamic priority cards or helpful empty state -->
+        </div>
+      </div>
+
+      <!-- 7.2 Dustbin Overview Table -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Campus Dustbin Overview</h3>
+            <p class="panel-subtitle">Integrated view with COA 7-bit numerical &amp; 2-bit categorical status encodings.</p>
+          </div>
+          <div class="table-legend">
+            <span class="legend-chip chip-critical">Critical (11)</span>
+            <span class="legend-chip chip-high">High (10)</span>
+            <span class="legend-chip chip-moderate">Moderate (01)</span>
+            <span class="legend-chip chip-low">Low (00)</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table" id="dashboard-table">
+            <thead>
+              <tr>
+                <th>Dustbin ID</th>
+                <th>Campus Location</th>
+                <th>Fill %</th>
+                <th>7-Bit Binary (COA)</th>
+                <th>2-Bit Code (COA)</th>
+                <th>Current Status</th>
+                <th>Last Manually Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: DUSTBIN MANAGEMENT
+         ========================================== -->
+    <section id="section-management" class="content-section" role="tabpanel" aria-labelledby="tab-management">
+      <div class="section-header">
+        <div>
+          <h2>Campus Dustbin Management</h2>
+          <p class="text-muted">Register, edit, delete, search, filter, and sort campus dustbin telemetry records.</p>
+        </div>
+      </div>
+
+      <div class="grid-two-cols">
+        <!-- Form Panel -->
+        <div class="panel form-panel">
+          <div class="panel-header">
+            <h3 id="form-title">➕ Register New Dustbin</h3>
+          </div>
+          <form id="dustbin-form" novalidate>
+            <input type="hidden" id="dustbin-form-mode" value="add">
+            <input type="hidden" id="dustbin-original-id" value="">
+
+            <div class="form-group">
+              <label for="input-bin-id">
+                Dustbin ID <span class="required">*</span>
+                <span class="field-hint">(Must be 'B' followed by exactly 2 decimal digits, e.g. B01, B12)</span>
+              </label>
+              <div class="input-with-validation">
+                <input type="text" id="input-bin-id" class="form-control" placeholder="e.g. B06" maxlength="5" required>
+                <div class="dfa-live-feedback" id="form-dfa-feedback">
+                  <span class="dfa-indicator-badge badge-pending">Awaiting input</span>
+                </div>
+              </div>
+              <small class="form-feedback-msg" id="bin-id-error"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="select-bin-location">
+                Campus Location (Graph Node) <span class="required">*</span>
+              </label>
+              <select id="select-bin-location" class="form-control" required>
+                <option value="">-- Select Valid Campus Graph Vertex --</option>
+                <option value="Main Gate">Main Gate</option>
+                <option value="Admin Block">Admin Block</option>
+                <option value="Academic Block">Academic Block</option>
+                <option value="Library">Library</option>
+                <option value="Cafeteria">Cafeteria</option>
+                <option value="Hostel Block">Hostel Block</option>
+                <option value="Sports Ground">Sports Ground</option>
+                <option value="Parking Area">Parking Area</option>
+              </select>
+              <small class="form-feedback-msg" id="bin-location-error"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="input-bin-fill">
+                Fill Percentage (0–100%) <span class="required">*</span>
+              </label>
+              <div class="fill-slider-wrapper">
+                <input type="range" id="slider-bin-fill" min="0" max="100" value="50" class="form-range">
+                <input type="number" id="input-bin-fill" min="0" max="100" value="50" class="form-control fill-number-input" required>
+                <span class="unit-label">%</span>
+              </div>
+              <div class="fill-preview-bar">
+                <div class="fill-preview-inner" id="form-fill-preview" style="width: 50%;"></div>
+              </div>
+              <div class="dynamic-coa-preview" id="form-coa-preview">
+                7-Bit Binary: <code>0110010</code> &bull; Status: <span class="badge badge-high">High (10)</span>
+              </div>
+              <small class="form-feedback-msg" id="bin-fill-error"></small>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btn-save-dustbin">Save Dustbin</button>
+              <button type="button" class="btn btn-secondary" id="btn-cancel-edit" style="display: none;">Cancel Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Validation / Help Callout -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Automated Validation Rules</h3>
+          </div>
+          <div class="validation-info-box">
+            <div class="info-item">
+              <div class="info-icon">⚙️</div>
+              <div>
+                <strong>FLAT DFA Validation:</strong>
+                <p>Every ID must be accepted by the language $L = \{Bdd \mid d \in \{0..9\}\}$. The ID is rejected before saving if it terminates in any state other than the accepting state $q_3$.</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">🆔</div>
+              <div>
+                <strong>Uniqueness Guarantee:</strong>
+                <p>Duplicate IDs are strictly forbidden. If an ID already exists in localStorage, it will be rejected.</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">🗺️</div>
+              <div>
+                <strong>Graph Vertex Consistency:</strong>
+                <p>The location must be one of the 8 canonical vertices defined in the campus navigation topology.</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">🔢</div>
+              <div>
+                <strong>COA Range Constraints:</strong>
+                <p>Fill percentages must be integer values from 0 to 100, fitting inside 7-bit unsigned integer limits ($0 \le x \le 127$).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search, Filter, Sort & Table -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Registered Dustbins List</h3>
+        </div>
+        <div class="filter-controls-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="management-search" class="form-control" placeholder="Search by Dustbin ID or Campus Location...">
+          </div>
+          <div class="filter-dropdowns">
+            <div class="filter-item">
+              <label for="filter-status">Filter Status:</label>
+              <select id="filter-status" class="form-control">
+                <option value="ALL">All Categories</option>
+                <option value="Critical">Critical (75–100%)</option>
+                <option value="High">High (50–74%)</option>
+                <option value="Moderate">Moderate (25–49%)</option>
+                <option value="Low">Low (0–24%)</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label for="sort-by">Sort By:</label>
+              <select id="sort-by" class="form-control">
+                <option value="id-asc">Dustbin ID (A &rarr; Z)</option>
+                <option value="id-desc">Dustbin ID (Z &rarr; A)</option>
+                <option value="fill-desc">Fill % (High &rarr; Low)</option>
+                <option value="fill-asc">Fill % (Low &rarr; High)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="management-table">
+            <thead>
+              <tr>
+                <th>Dustbin ID</th>
+                <th>Campus Location</th>
+                <th>Fill %</th>
+                <th>Category</th>
+                <th>2-Bit Code</th>
+                <th>7-Bit Binary</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="management-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 3: COA — BINARY DATA LAB
+         ========================================== -->
+    <section id="section-coa" class="content-section" role="tabpanel" aria-labelledby="tab-coa">
+      <div class="section-header">
+        <div>
+          <h2>COA &mdash; Number Systems &amp; Binary Data Lab</h2>
+          <p class="text-muted">
+            Computer Organization and Architecture (COA) concept: Decimal-binary conversions, 7-bit unsigned data representation, and 2-bit categorical status encoding.
+          </p>
+        </div>
+      </div>
+
+      <!-- Educational Card explaining COA Concept -->
+      <div class="panel educational-banner">
+        <div class="concept-badge">COA Concept Selected</div>
+        <h3>Number Systems, Decimal &amp; Binary Conversions, and Digital Encoding</h3>
+        <p>
+          In digital computer architecture, microcontrollers and telemetry transmission buffers represent physical analog or integer measurements as binary bits. 
+          For waste monitoring:
+        </p>
+        <ul class="concept-points">
+          <li><strong>7-Bit Unsigned Representation:</strong> The fill percentage ranges from $0$ to $100\%$. A 7-bit unsigned binary integer covers $2^7 = 128$ distinct states ($0$ to $127$), making 7 bits the minimal integer power-of-2 byte representation without wasting bit bandwidth.</li>
+          <li><strong>2-Bit Categorical Encoding:</strong> For low-power telemetry packets, dustbins transmit a compact 2-bit classification code: <code>00</code> for Low, <code>01</code> for Moderate, <code>10</code> for High, and <code>11</code> for Critical.</li>
+        </ul>
+      </div>
+
+      <!-- Live Campus Dustbin Binary Telemetry Inspector -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Active Dustbins: Binary Telemetry Inspector</h3>
+            <p class="panel-subtitle">Calculated dynamically for each campus dustbin using vanilla JavaScript bit operations.</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dustbin ID</th>
+                <th>Location</th>
+                <th>Decimal Value</th>
+                <th>7-Bit Binary (Padded)</th>
+                <th>2-Bit Status Code</th>
+                <th>Status Classification</th>
+                <th>Bit Breakdown Explanation</th>
+              </tr>
+            </thead>
+            <tbody id="coa-telemetry-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Interactive COA Calculators Grid -->
+      <div class="grid-two-cols">
+        <!-- 9.2 Decimal-to-Binary Calculator -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>9.2 Decimal-to-Binary Calculator</h3>
+            <span class="badge badge-primary">Repeated Division by 2</span>
+          </div>
+          <p class="panel-subtitle">Converts any decimal integer ($0 \le n \le 100$) into a 7-bit padded binary string.</p>
+          
+          <div class="calc-input-row">
+            <div class="form-group flex-1">
+              <label for="calc-dec-input">Enter Decimal Value (0–100):</label>
+              <input type="number" id="calc-dec-input" class="form-control" min="0" max="100" value="75" placeholder="0 - 100">
+            </div>
+            <button class="btn btn-primary btn-calc" id="btn-calc-dec-to-bin">Convert to Binary</button>
+          </div>
+
+          <div class="calc-result-box" id="calc-dec-result-box">
+            <div class="result-highlight">
+              <span class="result-label">7-Bit Binary Result:</span>
+              <span class="result-value" id="dec-to-bin-output">1001011</span>
+            </div>
+            <div class="status-match-box" id="dec-status-match-box">
+              Category: <strong>Critical</strong> &bull; 2-Bit Code: <code>11</code>
+            </div>
+            <div class="steps-container">
+              <h4>Repeated Division by 2 Steps:</h4>
+              <div class="table-responsive">
+                <table class="calc-steps-table">
+                  <thead>
+                    <tr>
+                      <th>Step</th>
+                      <th>Dividend</th>
+                      <th>Divisor</th>
+                      <th>Quotient</th>
+                      <th>Remainder (Bit)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dec-steps-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              <p class="steps-note" id="dec-steps-note">
+                Reading remainders from bottom to top yields binary: <strong>1001011</strong> (padded to 7 bits: <strong>1001011</strong>).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9.3 Binary-to-Decimal Calculator -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>9.3 Binary-to-Decimal Calculator</h3>
+            <span class="badge badge-primary">Place-Value Expansion</span>
+          </div>
+          <p class="panel-subtitle">Accepts valid binary strings (maximum 7 bits) and displays expanded positional notation.</p>
+
+          <div class="calc-input-row">
+            <div class="form-group flex-1">
+              <label for="calc-bin-input">Enter Binary String (Max 7 bits, '0' and '1'):</label>
+              <input type="text" id="calc-bin-input" class="form-control" maxlength="7" value="1001011" placeholder="e.g. 1001011">
+            </div>
+            <button class="btn btn-primary btn-calc" id="btn-calc-bin-to-dec">Convert to Decimal</button>
+          </div>
+          <small class="form-feedback-msg" id="bin-to-dec-error"></small>
+
+          <div class="calc-result-box" id="calc-bin-result-box">
+            <div class="result-highlight">
+              <span class="result-label">Decimal Value ($D_{10}$):</span>
+              <span class="result-value" id="bin-to-dec-output">75</span>
+            </div>
+            <div class="steps-container">
+              <h4>Positional Place-Value Equation:</h4>
+              <div class="math-equation-box" id="bin-equation-box">
+                <!-- Mathematical equation populated dynamically -->
+              </div>
+              <h4>Place-Value Breakdown Table:</h4>
+              <div class="table-responsive">
+                <table class="calc-steps-table">
+                  <thead>
+                    <tr>
+                      <th>Bit Index</th>
+                      <th>Bit ($b_i$)</th>
+                      <th>Place Value ($2^i$)</th>
+                      <th>Evaluation</th>
+                      <th>Contribution</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bin-steps-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9.4 Categorical Encoding Specification Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>9.4 Categorical Status Encoding Architecture</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Fill Percentage Range</th>
+                <th>Category Name</th>
+                <th>2-Bit Code</th>
+                <th>Operational Priority</th>
+                <th>Application Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0% &ndash; 24%</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td><code>00</code></td>
+                <td>Normal / Routine</td>
+                <td>No immediate collection required. Dustbin has adequate surplus volume.</td>
+              </tr>
+              <tr>
+                <td>25% &ndash; 49%</td>
+                <td><span class="badge badge-moderate">Moderate</span></td>
+                <td><code>01</code></td>
+                <td>Monitoring</td>
+                <td>Normal accumulation. Monitored during regular maintenance cycles.</td>
+              </tr>
+              <tr>
+                <td>50% &ndash; 74%</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td><code>10</code></td>
+                <td>High Priority</td>
+                <td>Eligible for route planning if no Critical bins exist on campus.</td>
+              </tr>
+              <tr>
+                <td>75% &ndash; 100%</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td><code>11</code></td>
+                <td>Urgent / Immediate</td>
+                <td>Highest collection priority. Must be serviced first by route planner.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 4: FLAT — DFA VALIDATOR
+         ========================================== -->
+    <section id="section-flat" class="content-section" role="tabpanel" aria-labelledby="tab-flat">
+      <div class="section-header">
+        <div>
+          <h2>FLAT &mdash; Deterministic Finite Automaton (DFA) Validator</h2>
+          <p class="text-muted">
+            Formal Language &amp; Automata Theory: Formally recognizing valid campus dustbin identifiers using a 5-tuple Deterministic Finite Automaton.
+          </p>
+        </div>
+      </div>
+
+      <!-- Educational Concept Banner -->
+      <div class="panel educational-banner">
+        <div class="concept-badge">FLAT Concept Selected</div>
+        <h3>Formal Language Recognition with Deterministic Finite Automata</h3>
+        <p>
+          In Formal Language and Automata Theory (FLAT), a <strong>Deterministic Finite Automaton (DFA)</strong> is a state machine that processes an input string symbol-by-symbol, transitioning deterministically between a finite set of states.
+        </p>
+        <p>
+          The valid Dustbin ID language is formally defined as:
+          <br>
+          <code class="formal-math">L = { Bdd | d &isin; {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} }</code>
+          <br>
+          Formally, $M = (Q, \Sigma, \delta, q_0, F)$ where:
+        </p>
+        <ul class="concept-points">
+          <li>$Q = \{q_0, q_1, q_2, q_3, q_{\text{dead}}\}$ &mdash; Finite set of internal states.</li>
+          <li>$\Sigma = \{ 'B', '0', '1', \dots, '9', \text{OTHER} \}$ &mdash; Input alphabet.</li>
+          <li>$q_0$ &mdash; Initial starting state.</li>
+          <li>$F = \{q_3\}$ &mdash; Set of accepting/final states ($q_3$ is the sole accepting state).</li>
+          <li>$\delta: Q \times \Sigma \to Q$ &mdash; Transition function that defines deterministic state changes.</li>
+        </ul>
+      </div>
+
+      <!-- Interactive DFA Tester and Visualizer Grid -->
+      <div class="grid-two-cols">
+        <!-- DFA Interactive Input & Trace -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>10.3 Interactive DFA Validator</h3>
+            <span class="badge badge-primary">String Acceptance</span>
+          </div>
+
+          <div class="form-group">
+            <label for="flat-test-input">Enter Dustbin Identifier String to Test:</label>
+            <div class="input-with-validation">
+              <input type="text" id="flat-test-input" class="form-control" placeholder="e.g. B01, B12, X01, B123" value="B01">
+              <button class="btn btn-primary" id="btn-run-dfa">Validate String</button>
+            </div>
+          </div>
+
+          <!-- Quick Test Preset Buttons -->
+          <div class="quick-preset-container">
+            <span class="preset-label">Standard Test Presets:</span>
+            <div class="preset-btn-group">
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B01">B01 (Valid)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B12">B12 (Valid)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B99">B99 (Valid)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="X01">X01 (Invalid Start)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B1">B1 (Too Short)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B123">B123 (Too Long)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="B1A">B1A (Alpha Char)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="b01">b01 (Lowercase)</button>
+              <button class="btn btn-sm btn-outline preset-btn" data-val="">[Empty Input]</button>
+            </div>
+          </div>
+
+          <!-- DFA Result Banner -->
+          <div id="dfa-result-banner" class="dfa-result-card accepted">
+            <div class="result-status-row">
+              <span class="result-status-badge" id="dfa-badge-status">ACCEPTED</span>
+              <span class="result-state-pill" id="dfa-pill-state">Final State: q3 &isin; F</span>
+            </div>
+            <p class="result-explanation" id="dfa-explanation-text">
+              The input string 'B01' begins with uppercase 'B', followed by exactly two decimal digits '0' and '1', terminating successfully in accepting state q3.
+            </p>
+          </div>
+
+          <!-- DFA Step-by-Step Transition Trace Table -->
+          <div class="trace-container">
+            <h4>Step-by-Step State Transition Trace:</h4>
+            <div class="table-responsive">
+              <table class="calc-steps-table">
+                <thead>
+                  <tr>
+                    <th>Step #</th>
+                    <th>Current State</th>
+                    <th>Input Symbol</th>
+                    <th>Transition Rule &delta;</th>
+                    <th>Next State</th>
+                    <th>State Semantics</th>
+                  </tr>
+                </thead>
+                <tbody id="dfa-trace-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10.4 DFA State Diagram (SVG) -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>10.4 DFA State Diagram &amp; Live Execution</h3>
+            <span class="badge badge-info" id="diagram-active-state-badge">Active: q0</span>
+          </div>
+          <p class="panel-subtitle">SVG state diagram with live state highlighting during string verification.</p>
+
+          <div class="svg-diagram-wrapper">
+            <svg id="dfa-svg" class="dfa-svg-canvas" viewBox="0 0 650 360" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#1e293b"/>
+                </marker>
+                <marker id="arrowhead-highlight" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#16a34a"/>
+                </marker>
+                <marker id="arrowhead-dead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#dc2626"/>
+                </marker>
+              </defs>
+
+              <!-- Start Arrow into q0 -->
+              <line x1="20" y1="100" x2="60" y2="100" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+              <text x="35" y="90" font-size="12" font-weight="bold" fill="#475569">Start</text>
+
+              <!-- Forward Transitions -->
+              <!-- q0 -> q1 ('B') -->
+              <line x1="120" y1="100" x2="220" y2="100" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+              <text x="170" y="90" font-size="13" font-weight="bold" fill="#16a34a" text-anchor="middle">'B'</text>
+
+              <!-- q1 -> q2 ([0-9]) -->
+              <line x1="280" y1="100" x2="380" y2="100" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+              <text x="330" y="90" font-size="13" font-weight="bold" fill="#16a34a" text-anchor="middle">[0-9]</text>
+
+              <!-- q2 -> q3 ([0-9]) -->
+              <line x1="440" y1="100" x2="540" y2="100" stroke="#1e293b" stroke-width="2.5" marker-end="url(#arrowhead)" />
+              <text x="490" y="90" font-size="13" font-weight="bold" fill="#16a34a" text-anchor="middle">[0-9]</text>
+
+              <!-- Downward error transitions to q_dead -->
+              <!-- q0 -> q_dead (other) -->
+              <path d="M 90 130 C 90 200, 260 260, 310 260" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dead)"/>
+              <text x="135" y="215" font-size="11" fill="#dc2626">other</text>
+
+              <!-- q1 -> q_dead (non-digit) -->
+              <path d="M 250 130 C 250 180, 290 230, 320 250" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dead)"/>
+              <text x="260" y="195" font-size="11" fill="#dc2626">non-digit</text>
+
+              <!-- q2 -> q_dead (non-digit) -->
+              <path d="M 410 130 C 410 180, 380 220, 360 248" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dead)"/>
+              <text x="400" y="195" font-size="11" fill="#dc2626">non-digit</text>
+
+              <!-- q3 -> q_dead (any excess char) -->
+              <path d="M 570 130 C 570 210, 430 260, 380 260" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowhead-dead)"/>
+              <text x="510" y="215" font-size="11" fill="#dc2626">any excess char</text>
+
+              <!-- q_dead self-loop -->
+              <path d="M 330 290 C 300 350, 390 350, 360 290" fill="none" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowhead-dead)"/>
+              <text x="345" y="345" font-size="11" font-weight="bold" fill="#dc2626" text-anchor="middle">any symbol</text>
+
+              <!-- State Nodes -->
+              <!-- State q0 -->
+              <g id="svg-node-q0" class="dfa-node active-state" transform="translate(90, 100)">
+                <circle r="30" fill="#f8fafc" stroke="#334155" stroke-width="3" />
+                <text y="5" text-anchor="middle" font-weight="bold" font-size="14" fill="#0f172a">q0</text>
+                <text y="48" text-anchor="middle" font-size="10" fill="#64748b">Start</text>
+              </g>
+
+              <!-- State q1 -->
+              <g id="svg-node-q1" class="dfa-node" transform="translate(250, 100)">
+                <circle r="30" fill="#f8fafc" stroke="#334155" stroke-width="3" />
+                <text y="5" text-anchor="middle" font-weight="bold" font-size="14" fill="#0f172a">q1</text>
+                <text y="48" text-anchor="middle" font-size="10" fill="#64748b">Saw 'B'</text>
+              </g>
+
+              <!-- State q2 -->
+              <g id="svg-node-q2" class="dfa-node" transform="translate(410, 100)">
+                <circle r="30" fill="#f8fafc" stroke="#334155" stroke-width="3" />
+                <text y="5" text-anchor="middle" font-weight="bold" font-size="14" fill="#0f172a">q2</text>
+                <text y="48" text-anchor="middle" font-size="10" fill="#64748b">Saw 1st Digit</text>
+              </g>
+
+              <!-- State q3 (Accepting State: Double Circle) -->
+              <g id="svg-node-q3" class="dfa-node accepting-state" transform="translate(570, 100)">
+                <circle r="32" fill="#ecfdf5" stroke="#16a34a" stroke-width="2.5" />
+                <circle r="26" fill="#f8fafc" stroke="#16a34a" stroke-width="2.5" />
+                <text y="5" text-anchor="middle" font-weight="bold" font-size="14" fill="#15803d">q3</text>
+                <text y="50" text-anchor="middle" font-size="10" font-weight="bold" fill="#15803d">ACCEPT</text>
+              </g>
+
+              <!-- State q_dead (Trap State) -->
+              <g id="svg-node-q_dead" class="dfa-node trap-state" transform="translate(345, 260)">
+                <circle r="28" fill="#fef2f2" stroke="#dc2626" stroke-width="2.5" />
+                <text y="5" text-anchor="middle" font-weight="bold" font-size="13" fill="#dc2626">q_dead</text>
+                <text y="45" text-anchor="middle" font-size="10" fill="#991b1b">Trap / Dead</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="dfa-diagram-legend">
+            <span class="legend-chip"><span class="legend-color-dot dot-start"></span> Start State ($q_0$)</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-accept"></span> Accepting State ($q_3 \in F$)</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-trap"></span> Trap State ($q_{\text{dead}}$)</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-active"></span> Currently Active State</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formal DFA Transition Table -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Formal DFA Transition Table $\delta(q, c)$</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>State $q \in Q$</th>
+                <th>Uppercase 'B'</th>
+                <th>Decimal Digit [0–9]</th>
+                <th>Other Characters / Excess</th>
+                <th>State Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>&rarr; $q_0$</strong> (Start)</td>
+                <td>$q_1$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>Initial start state</td>
+              </tr>
+              <tr>
+                <td><strong>$q_1$</strong></td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_2$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>Prefix 'B' validated</td>
+              </tr>
+              <tr>
+                <td><strong>$q_2$</strong></td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_3$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>First digit validated</td>
+              </tr>
+              <tr class="table-success">
+                <td><strong>* $q_3$</strong> (Accepting)</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td><strong>Final accepting state ($F$)</strong></td>
+              </tr>
+              <tr class="table-danger">
+                <td><strong>$q_{\text{dead}}$</strong> (Trap)</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>$q_{\text{dead}}$</td>
+                <td>Dead/error trap state (non-accepting)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 5: DAA — COLLECTION ROUTE PLANNER
+         ========================================== -->
+    <section id="section-daa" class="content-section" role="tabpanel" aria-labelledby="tab-daa">
+      <div class="section-header">
+        <div>
+          <h2>DAA &mdash; Campus Graph &amp; BFS Route Planner</h2>
+          <p class="text-muted">
+            Design and Analysis of Algorithms (DAA): Unweighted Breadth-First Search (BFS) graph pathfinding and multi-rule urgency target recommendation.
+          </p>
+        </div>
+      </div>
+
+      <!-- Educational Banner for DAA Concept -->
+      <div class="panel educational-banner">
+        <div class="concept-badge">DAA Concept Selected</div>
+        <h3>Unweighted Graph Modeling &amp; Breadth-First Search (BFS) Pathfinding</h3>
+        <p>
+          In Design and Analysis of Algorithms (DAA), an unweighted campus road network is formally modeled as an undirected graph $G = (V, E)$, where vertices $V$ represent physical campus buildings and edges $E$ denote direct traversable paths.
+        </p>
+        <ul class="concept-points">
+          <li><strong>Breadth-First Search (BFS):</strong> BFS uses a First-In-First-Out (FIFO) queue to explore vertices layer by layer in order of their edge distance from the source vertex.</li>
+          <li><strong>Optimality Guarantee:</strong> In an unweighted graph, BFS is mathematically guaranteed to discover a path between source $s$ and target $t$ with the <em>minimum number of edges</em> (hops).</li>
+          <li><strong>Asymptotic Complexity:</strong> Time Complexity is $O(V + E)$ since each vertex is enqueued at most once and each incident edge is traversed at most twice. Space Complexity is $O(V)$ for the visited set, queue, and parent pointers.</li>
+          <li><strong>Scope Clarification:</strong> BFS minimizes edge count (hops), not physical Euclidean distance or terrain traversal time.</li>
+        </ul>
+      </div>
+
+      <!-- Route Planner Controls Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>11.3 Route Planner Controls</h3>
+        </div>
+        <div class="route-controls-grid">
+          <div class="form-group">
+            <label for="select-route-start">Worker Starting Campus Location (Source Vertex):</label>
+            <select id="select-route-start" class="form-control">
+              <option value="Main Gate" selected>Main Gate</option>
+              <option value="Admin Block">Admin Block</option>
+              <option value="Academic Block">Academic Block</option>
+              <option value="Library">Library</option>
+              <option value="Cafeteria">Cafeteria</option>
+              <option value="Hostel Block">Hostel Block</option>
+              <option value="Sports Ground">Sports Ground</option>
+              <option value="Parking Area">Parking Area</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="select-route-target">Manual Target Dustbin (Target Vertex):</label>
+            <select id="select-route-target" class="form-control">
+              <!-- Dynamically populated with active bins -->
+            </select>
+          </div>
+
+          <div class="route-actions-group">
+            <button class="btn btn-primary" id="btn-calc-route">
+              <span class="btn-icon">🔍</span> Calculate Shortest Route (BFS)
+            </button>
+            <button class="btn btn-success" id="btn-recommend-target">
+              <span class="btn-icon">⚡</span> Recommend Next Collection Target
+            </button>
+            <button class="btn btn-secondary" id="btn-clear-route">
+              <span class="btn-icon">🧹</span> Clear Route Display
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Target Recommendation & Execution Output Cards -->
+      <div class="grid-two-cols">
+        <!-- 11.5 Next Collection Target Recommendation Card -->
+        <div class="panel" id="recommendation-card">
+          <div class="panel-header">
+            <h3>11.5 Target Recommendation Engine</h3>
+            <span class="badge badge-primary" id="rec-status-badge">Awaiting Query</span>
+          </div>
+          <div class="rec-explanation-box" id="rec-content-box">
+            <p class="text-muted">
+              Click <strong>"Recommend Next Collection Target"</strong> to evaluate all campus dustbins using the strict multi-level tie-breaking rules:
+            </p>
+            <ol class="rule-list">
+              <li><strong>Critical Priority:</strong> Consider only Critical bins (75–100%) if any exist.</li>
+              <li><strong>High Priority:</strong> Otherwise, consider High-category bins (50–74%).</li>
+              <li><strong>No Urgent Target:</strong> If neither exist, notify the operator that no urgent collection is needed.</li>
+              <li><strong>Fewest BFS Edges:</strong> Run BFS from source and pick candidate with minimum hops.</li>
+              <li><strong>Fill % Tie-Breaker:</strong> If tied in hops, pick bin with higher fill percentage.</li>
+              <li><strong>ID Tie-Breaker:</strong> If still tied, pick lexicographically smallest ID.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- 11.4 BFS Execution Result Card -->
+        <div class="panel" id="route-result-card">
+          <div class="panel-header">
+            <h3>11.4 BFS Calculated Route Output</h3>
+            <span class="badge badge-info" id="route-edge-badge">0 Edges</span>
+          </div>
+          <div id="route-output-content">
+            <p class="text-muted">Select a source and target above, then click <strong>"Calculate Shortest Route (BFS)"</strong> to display the path.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11.6 Campus Graph Visualization (SVG) -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>11.6 Interactive Campus Graph Visualization</h3>
+            <p class="panel-subtitle">Undirected campus pathway network with real-time BFS route highlighting derived directly from algorithm execution.</p>
+          </div>
+          <div class="graph-legend">
+            <span class="legend-chip"><span class="legend-color-dot dot-source"></span> Worker Start (Source)</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-target"></span> Target Dustbin</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-route"></span> Route Pathway</span>
+            <span class="legend-chip"><span class="legend-color-dot dot-default"></span> Campus Vertex</span>
+          </div>
+        </div>
+
+        <div class="svg-diagram-wrapper">
+          <svg id="campus-graph-svg" class="campus-svg-canvas" viewBox="0 0 850 500" xmlns="http://www.w3.org/2000/svg">
+            <!-- Edges group -->
+            <g id="campus-edges-group">
+              <!-- Rendered via JavaScript -->
+            </g>
+            <!-- Nodes group -->
+            <g id="campus-nodes-group">
+              <!-- Rendered via JavaScript -->
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 11.7 DAA Complexity Analysis & BFS Step Walkthrough -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>11.7 Algorithmic Complexity &amp; Theoretical Analysis</h3>
+        </div>
+        <div class="complexity-grid">
+          <div class="complexity-box">
+            <h4>Time Complexity: $\mathcal{O}(V + E)$</h4>
+            <p>
+              In our graph, $|V| = 8$ vertices and $|E| = 11$ undirected edges. 
+              The algorithm initializes the visited set and queue in $\mathcal{O}(V)$ time. Each vertex enters the FIFO queue at most once. 
+              When a vertex is dequeued, its incident edges in the adjacency list are examined. 
+              Because the graph is undirected, every edge is examined exactly twice (once from each endpoint). 
+              Thus total running time is strictly bounded by $\mathcal{O}(V + E)$.
+            </p>
+          </div>
+          <div class="complexity-box">
+            <h4>Space Complexity: $\mathcal{O}(V)$</h4>
+            <p>
+              BFS maintains three distinct data structures:
+            </p>
+            <ul>
+              <li><strong>Visited Set:</strong> Tracks whether each vertex has been discovered ($\le |V|$ elements).</li>
+              <li><strong>FIFO Queue:</strong> Holds discovered vertices awaiting neighbor expansion ($\le |V|$ elements).</li>
+              <li><strong>Parent Map:</strong> Stores the predecessor of each discovered vertex for back-pointer path reconstruction ($\le |V|$ entries).</li>
+            </ul>
+            <p>The total auxiliary memory footprint is strictly $\mathcal{O}(V)$.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 6: ABOUT PROJECT
+         ========================================== -->
+    <section id="section-about" class="content-section" role="tabpanel" aria-labelledby="tab-about">
+      <div class="section-header">
+        <div>
+          <h2>About Smart Campus Waste Monitoring &amp; Collection Route Planner</h2>
+          <p class="text-muted">Integrated Microproject Documentation, Academic Foundations, and Automated Test Suite.</p>
+        </div>
+      </div>
+
+      <!-- Project Metadata Grid -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Project Identification &amp; Developer Details</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <tbody>
+              <tr>
+                <th style="width: 250px;">Project Title</th>
+                <td><strong>Smart Campus Waste Monitoring &amp; Collection Route Planner</strong></td>
+              </tr>
+              <tr>
+                <th>Student Developer</th>
+                <td><strong>Dron Kumar Singh</strong></td>
+              </tr>
+              <tr>
+                <th>Student College Email</th>
+                <td><code>[laitonjam.dronkumar.s70@kalvium.community]</code></td>
+              </tr>
+              <tr>
+                <th>Integrated Disciplines</th>
+                <td>
+                  <span class="badge badge-primary">Computer Organization &amp; Architecture (COA)</span>
+                  <span class="badge badge-success">Formal Language &amp; Automata Theory (FLAT)</span>
+                  <span class="badge badge-info">Design &amp; Analysis of Algorithms (DAA)</span>
+                </td>
+              </tr>
+              <tr>
+                <th>Technology Stack</th>
+                <td>HTML5, CSS3, Vanilla JavaScript (ES6+), Browser localStorage, Scalable Vector Graphics (SVG)</td>
+              </tr>
+              <tr>
+                <th>External Dependencies</th>
+                <td><strong>None (Zero third-party libraries, 100% offline self-contained)</strong></td>
+              </tr>
+              <tr>
+                <th>Operational Scope</th>
+                <td>
+                  Educational Software Prototype. Dustbin fill readings are manually entered or simulated. 
+                  No IoT sensors, live GPS tracking, or direct physical actuation are connected.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- In-App Automated Test Suite Runner -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>In-App Automated Verification Test Suite</h3>
+            <p class="panel-subtitle">Execute unit tests directly in your browser against COA conversions, FLAT DFA state transitions, DAA BFS route computations, and recommendation tie-breakers.</p>
+          </div>
+          <button class="btn btn-primary" id="btn-run-all-tests">
+            <span class="btn-icon">🧪</span> Run All Automated Unit Tests
+          </button>
+        </div>
+
+        <div id="test-suite-summary-bar" class="test-suite-summary" style="display: none;">
+          <div class="test-stat-item"><span class="test-stat-num" id="tests-total">0</span> Total Tests</div>
+          <div class="test-stat-item stat-pass"><span class="test-stat-num" id="tests-passed">0</span> Passed</div>
+          <div class="test-stat-item stat-fail"><span class="test-stat-num" id="tests-failed">0</span> Failed</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table" id="automated-tests-table">
+            <thead>
+              <tr>
+                <th>Test ID</th>
+                <th>Module</th>
+                <th>Test Scenario</th>
+                <th>Input Data</th>
+                <th>Expected Result</th>
+                <th>Actual Observed Output</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="automated-tests-body">
+              <tr>
+                <td colspan="7" class="text-center text-muted">Click <strong>"Run All Automated Unit Tests"</strong> to execute tests and view actual results.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Quick Edit / Add Modal Dialog -->
+  <div id="modal-backdrop" class="modal-backdrop" style="display: none;">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h3 id="modal-title">Quick Update Dustbin Fill Level</h3>
+        <button class="modal-close-btn" id="btn-close-modal" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modal-select-bin">Select Dustbin:</label>
+          <select id="modal-select-bin" class="form-control">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="modal-input-fill">New Fill Percentage (0–100%):</label>
+          <div class="fill-slider-wrapper">
+            <input type="range" id="modal-slider-fill" min="0" max="100" value="50" class="form-range">
+            <input type="number" id="modal-input-fill" min="0" max="100" value="50" class="form-control fill-number-input">
+            <span class="unit-label">%</span>
+          </div>
+          <div class="fill-preview-bar">
+            <div class="fill-preview-inner" id="modal-fill-preview" style="width: 50%;"></div>
+          </div>
+          <div class="dynamic-coa-preview" id="modal-coa-preview">
+            7-Bit Binary: <code>0110010</code> &bull; Status: <span class="badge badge-high">High (10)</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="btn-modal-submit">Update Fill Level</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>
+        <strong>Smart Campus Waste Monitoring &amp; Collection Route Planner</strong> &bull; Developed by <strong>Dron Kumar Singh</strong>
+      </p>
+      <p class="text-muted">
+        Academic Microproject Integration &mdash; Computer Organization &amp; Architecture (COA) &bull; Formal Language &amp; Automata Theory (FLAT) &bull; Design &amp; Analysis of Algorithms (DAA)
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
