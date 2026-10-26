@@ -8,7 +8,7 @@
 
 * **Student Developer:** Dron Kumar Singh
 * **Project Title:** Smart Campus Waste Monitoring & Collection Route Planner
-* **Student College Email:** `[Insert and verify the correct college email address]`
+* **Student College Email:** `[laitonjam.dronkumarsingh.s70@kalvium.community]`
 * **Notice:** Educational Prototype — Dustbin readings are manually updated or simulated. No live sensors are connected.
 * **Target Environment:** Standard Web Browsers (Chrome, Edge, Firefox, Safari) &mdash; 100% Offline Capability
 
@@ -253,3 +253,9 @@ In compliance with project specifications:
 1. **Simulated Telemetry:** Sensor data is entered via GUI forms or simulated locally. Future work could integrate low-power microcontroller hardware (e.g., ESP32 ultrasonic sensors) via WebSockets.
 2. **Unweighted BFS Simplification:** Campus pathways are treated as uniform unweighted edges. Future extensions could assign metric distance weights and implement Dijkstra's Algorithm or A* Search.
 3. **Single Next-Stop Heuristic:** The recommendation engine selects the immediate next container rather than solving the full NP-hard multi-stop Traveling Salesperson Tour across an entire shift.
+
+## 12 . Github Repository Link 
+https://github.com/Jager001840/smart-campus-waste-planner_DronKumar.git
+
+## 13  Deployment Link 
+https://smart-campus-waste-planner-dronkuma.vercel.app/
